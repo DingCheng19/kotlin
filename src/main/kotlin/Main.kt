@@ -69,7 +69,7 @@ fun main(args: Array<String>){
 
 //            // 更新
             localTimeAfterRequest   = System.currentTimeMillis()
-            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest )
+            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest ) -2
         }
     } catch (e: Exception) {
         e.printStackTrace()
