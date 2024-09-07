@@ -98,7 +98,7 @@ fun main(args: Array<String>) {
 //        val str3 = formatUnixTimestamp(localTimeAfterRequest)
 //        val str4 = formatUnixTimestamp(activesAt)
 //        val str5 = formatUnixTimestamp(calledAt)
-        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) / 2 - 10
+        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest )
         while (true) {
 
 
@@ -134,7 +134,7 @@ fun main(args: Array<String>) {
 
 //            // 更新
             localTimeAfterRequest   = System.currentTimeMillis()
-            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest ) / 2 - 10
+            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest )
 //            activesAt = result.getLong("actives_at")
 //            calledAt = calculateServerReturnTime(localTimeBeforeRequest, result.getLong("called_at"),localTimeAfterRequest)
         }
