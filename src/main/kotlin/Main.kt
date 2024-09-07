@@ -1,13 +1,12 @@
-import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.system.exitProcess
-import kotlinx.coroutines.runBlocking
 
 fun startChallenge(nickname: String): JSONObject {
     val endpoint = "http://challenge.z2o.cloud/challenges?nickname=$nickname"
@@ -80,16 +79,16 @@ fun calculateServerTime(
     return serverTime.toEpochMilli()
 }
 
-fun main(args: Array<String>) = runBlocking {
+fun main(args: Array<String>) {
     val nickname = "nikeDing"
 //    var activesAt: Long = 0
 //    var calledAt: Long = 0
     var waitTime: Long = 0
     try {
         // チャレンジの開始
-        var localTimeBeforeRequest  = System.nanoTime()
+        var localTimeBeforeRequest  = System.currentTimeMillis()
         val challenge = startChallenge(nickname)
-        var localTimeAfterRequest   = System.nanoTime()
+        var localTimeAfterRequest   = System.currentTimeMillis()
         val challengeId = challenge.getString("id")
         println("チャレンジ開始、チャレンジID: $challengeId")
 //        activesAt = challenge.getLong("actives_at")
@@ -99,21 +98,18 @@ fun main(args: Array<String>) = runBlocking {
 //        val str3 = formatUnixTimestamp(localTimeAfterRequest)
 //        val str4 = formatUnixTimestamp(activesAt)
 //        val str5 = formatUnixTimestamp(calledAt)
-         waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) / 2 / 1_000_000 - 10
-//        waitTime = calculateWaitTime(challenge.getLong("actives_at"),challenge.getLong("called_at"),localTimeBeforeRequest,localTimeAfterRequest)
+        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) / 2 - 10
         while (true) {
-
 
 
 
             if (waitTime > 0) {
                 println("次の呼び出し時間まで ${waitTime / 1000.0} 秒待機")
-//                Thread.sleep(waitTime)
-                delay(waitTime )
+                Thread.sleep(waitTime)
             }
 
             // 呼び出しの実行
-            localTimeBeforeRequest  = System.nanoTime()
+            localTimeBeforeRequest  = System.currentTimeMillis()
             val result = makeCall(challengeId)
 
 //            println("呼び出し成功、現在の時間: ${result.getLong("called_at")}, 予定時間: ${result.getLong("actives_at")}, 総差分: ${result.getLong("total_diff")}ms")
@@ -137,10 +133,8 @@ fun main(args: Array<String>) = runBlocking {
             }
 
 //            // 更新
-            localTimeAfterRequest   = System.nanoTime()
-            waitTime = result.getLong("actives_at") - result.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) / 2 / 1_000_000- 11
-
-//            waitTime = calculateWaitTime(result.getLong("actives_at"),result.getLong("called_at"),localTimeBeforeRequest,localTimeAfterRequest) //result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest ) / 2 - 10
+            localTimeAfterRequest   = System.currentTimeMillis()
+            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest ) / 2 - 10
 //            activesAt = result.getLong("actives_at")
 //            calledAt = calculateServerReturnTime(localTimeBeforeRequest, result.getLong("called_at"),localTimeAfterRequest)
         }
@@ -148,11 +142,6 @@ fun main(args: Array<String>) = runBlocking {
         e.printStackTrace()
         exitProcess(1)
     }
-}
-
-fun calculateWaitTime(activesAt: Long, calledAt: Long, localTimeBeforeRequest: Long, localTimeAfterRequest: Long): Long {
-    // 使用纳秒时间来计算waitTime
-    return activesAt - calledAt - (localTimeAfterRequest - localTimeBeforeRequest) / 2 -10 //- 10_000_000 // 10ms的缓冲
 }
 
 fun formatUnixTimestamp(unixTimestamp: Long): String {
