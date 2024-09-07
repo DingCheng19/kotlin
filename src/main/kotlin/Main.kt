@@ -86,9 +86,9 @@ fun main(args: Array<String>) {
     var waitTime: Long = 0
     try {
         // チャレンジの開始
-        var localTimeBeforeRequest  = System.currentTimeMillis()
+        var localTimeBeforeRequest  = System.nanoTime()
         val challenge = startChallenge(nickname)
-        var localTimeAfterRequest   = System.currentTimeMillis()
+        var localTimeAfterRequest   = System.nanoTime()
         val challengeId = challenge.getString("id")
         println("チャレンジ開始、チャレンジID: $challengeId")
 //        activesAt = challenge.getLong("actives_at")
@@ -98,7 +98,7 @@ fun main(args: Array<String>) {
 //        val str3 = formatUnixTimestamp(localTimeAfterRequest)
 //        val str4 = formatUnixTimestamp(activesAt)
 //        val str5 = formatUnixTimestamp(calledAt)
-        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) +70
+        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest )/1_000_000// +70
         while (true) {
 
 
@@ -109,7 +109,7 @@ fun main(args: Array<String>) {
             }
 
             // 呼び出しの実行
-            localTimeBeforeRequest  = System.currentTimeMillis()
+            localTimeBeforeRequest  = System.nanoTime()
             val result = makeCall(challengeId)
 
 //            println("呼び出し成功、現在の時間: ${result.getLong("called_at")}, 予定時間: ${result.getLong("actives_at")}, 総差分: ${result.getLong("total_diff")}ms")
@@ -133,8 +133,8 @@ fun main(args: Array<String>) {
             }
 
 //            // 更新
-            localTimeAfterRequest   = System.currentTimeMillis()
-            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest )
+            localTimeAfterRequest   = System.nanoTime()
+            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest )/1_000_000
 //            activesAt = result.getLong("actives_at")
 //            calledAt = calculateServerReturnTime(localTimeBeforeRequest, result.getLong("called_at"),localTimeAfterRequest)
         }
