@@ -98,7 +98,7 @@ fun main(args: Array<String>) {
 //        val str3 = formatUnixTimestamp(localTimeAfterRequest)
 //        val str4 = formatUnixTimestamp(activesAt)
 //        val str5 = formatUnixTimestamp(calledAt)
-        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest )
+        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) +70
         while (true) {
 
 
