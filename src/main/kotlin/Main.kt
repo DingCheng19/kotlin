@@ -28,25 +28,38 @@ fun makeCall(challengeId: String): JSONObject {
     }
 }
 
+fun preciseSleep(targetNanoseconds: Long) {
+    val startTime = System.nanoTime()
+    var elapsedTime: Long
+    do {
+        elapsedTime = System.nanoTime() - startTime
+    } while (elapsedTime < targetNanoseconds)
+}
+
+fun millisecondsToNanoseconds(milliseconds: Long): Long {
+    return milliseconds * 1_000_000
+}
+
 fun main(args: Array<String>){
     val nickname = "nikeDing"
     var waitTime: Long = 0
     try {
         // チャレンジの開始
-        var localTimeBeforeRequest  = System.currentTimeMillis()
+        var localTimeBeforeRequest  = System.nanoTime()
         val challenge = startChallenge(nickname)
-        var localTimeAfterRequest   = System.currentTimeMillis()
+        var localTimeAfterRequest   = System.nanoTime()
         val challengeId = challenge.getString("id")
         println("チャレンジ開始、チャレンジID: $challengeId")
-        waitTime = challenge.getLong("actives_at") - challenge.getLong("called_at") - (localTimeAfterRequest -localTimeBeforeRequest ) +70
+        waitTime = millisecondsToNanoseconds(challenge.getLong("actives_at") - challenge.getLong("called_at")) - (localTimeAfterRequest -localTimeBeforeRequest ) +millisecondsToNanoseconds(76)
         while (true) {
-            if (waitTime > 0) {
-                println("次の呼び出し時間まで ${waitTime / 1000.0} 秒待機")
-                Thread.sleep(waitTime)
-            }
+//            if (waitTime > 0) {
+//                println("次の呼び出し時間まで ${waitTime / 1000.0} 秒待機")
+//                Thread.sleep(waitTime)
+//            }
+            preciseSleep(waitTime)
 
             // 呼び出しの実行
-            localTimeBeforeRequest  = System.currentTimeMillis()
+            localTimeBeforeRequest  = System.nanoTime()
             val result = makeCall(challengeId)
 
             val calledAtStr = if (result.has("called_at")) result.getLong("called_at") else "不明"
@@ -68,8 +81,8 @@ fun main(args: Array<String>){
             }
 
 //            // 更新
-            localTimeAfterRequest   = System.currentTimeMillis()
-            waitTime = result.getLong("actives_at") - result.getLong("called_at")- (localTimeAfterRequest -localTimeBeforeRequest ) -2
+            localTimeAfterRequest   = System.nanoTime()
+            waitTime = millisecondsToNanoseconds(result.getLong("actives_at") - result.getLong("called_at"))- (localTimeAfterRequest -localTimeBeforeRequest ) //-millisecondsToNanoseconds(2)
         }
     } catch (e: Exception) {
         e.printStackTrace()
