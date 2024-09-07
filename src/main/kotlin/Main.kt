@@ -2,29 +2,69 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.system.exitProcess
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 
+//fun startChallenge(nickname: String): JSONObject {
+//    val endpoint = "http://challenge.z2o.cloud/challenges?nickname=$nickname"
+//    val url = URL(endpoint)
+//    with(url.openConnection() as HttpURLConnection) {
+//        requestMethod = "POST"
+//        inputStream.bufferedReader().use { reader ->
+//            val response = reader.readText()
+//            return JSONObject(response)
+//        }
+//    }
+//}
+//
+//fun makeCall(challengeId: String): JSONObject {
+//    val endpoint = "http://challenge.z2o.cloud/challenges"
+//    val url = URL(endpoint)
+//    with(url.openConnection() as HttpURLConnection) {
+//        requestMethod = "PUT"
+//        setRequestProperty("X-Challenge-Id", challengeId)
+//        inputStream.bufferedReader().use { reader ->
+//            val response = reader.readText()
+//            return JSONObject(response)
+//        }
+//    }
+//}
+val client = OkHttpClient()
 fun startChallenge(nickname: String): JSONObject {
     val endpoint = "http://challenge.z2o.cloud/challenges?nickname=$nickname"
-    val url = URL(endpoint)
-    with(url.openConnection() as HttpURLConnection) {
-        requestMethod = "POST"
-        inputStream.bufferedReader().use { reader ->
-            val response = reader.readText()
-            return JSONObject(response)
-        }
+
+    // 创建空的请求体，因为 POST 请求可能不需要额外的数据
+    val requestBody = "".toRequestBody("application/json; charset=utf-8".toMediaType())
+
+    // 创建 POST 请求
+    val request = Request.Builder()
+        .url(endpoint)
+        .post(requestBody)
+        .build()
+
+    // 执行请求并解析响应
+    client.newCall(request).execute().use { response ->
+        return JSONObject(response.body!!.string())
     }
 }
 
 fun makeCall(challengeId: String): JSONObject {
     val endpoint = "http://challenge.z2o.cloud/challenges"
-    val url = URL(endpoint)
-    with(url.openConnection() as HttpURLConnection) {
-        requestMethod = "PUT"
-        setRequestProperty("X-Challenge-Id", challengeId)
-        inputStream.bufferedReader().use { reader ->
-            val response = reader.readText()
-            return JSONObject(response)
-        }
+
+    // 创建空的请求体，因为 PUT 请求可能不需要额外的数据
+    val requestBody = "".toRequestBody("application/json; charset=utf-8".toMediaType())
+
+    // 创建 PUT 请求，并设置请求头
+    val request = Request.Builder()
+        .url(endpoint)
+        .put(requestBody)
+        .addHeader("X-Challenge-Id", challengeId)
+        .build()
+
+    // 执行请求并解析响应
+    client.newCall(request).execute().use { response ->
+        return JSONObject(response.body!!.string())
     }
 }
 
@@ -50,7 +90,7 @@ fun main(args: Array<String>){
         var localTimeAfterRequest   = System.nanoTime()
         val challengeId = challenge.getString("id")
         println("チャレンジ開始、チャレンジID: $challengeId")
-        waitTime = millisecondsToNanoseconds(challenge.getLong("actives_at") - challenge.getLong("called_at")) - (localTimeAfterRequest -localTimeBeforeRequest ) +millisecondsToNanoseconds(76)
+        waitTime = millisecondsToNanoseconds(challenge.getLong("actives_at") - challenge.getLong("called_at")) - (localTimeAfterRequest -localTimeBeforeRequest ) +millisecondsToNanoseconds(140)  //76
         while (true) {
 //            if (waitTime > 0) {
 //                println("次の呼び出し時間まで ${waitTime / 1000.0} 秒待機")
